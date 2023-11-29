@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:task1/counter_provider.dart';
+import 'package:task1/counter_manager.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -33,22 +34,20 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const ProviderScope(child: MyHomePage(title: 'Flutter Demo Home Page')),
+      home: const ProviderScope(
+          child: MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
-
 
 class MyHomePage extends ConsumerWidget {
   const MyHomePage({required this.title, super.key});
 
   final String title;
 
-
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final counter = ref.watch(counterProvider);
+    CounterManager counterManager = CounterManager();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -87,16 +86,20 @@ class MyHomePage extends ConsumerWidget {
             const Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            ValueListenableBuilder(
+                valueListenable: counterManager.counter,
+                builder: (context, value, child) {
+                  return Text(
+                    '${counterManager.counter.value}',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  );
+                }),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(counterProvider.notifier).increment();
+          counterManager.increment();
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
